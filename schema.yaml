@@ -1,0 +1,257 @@
+swagger: '2.0'
+info:
+  title: Swagger
+  version: 0.0.1
+tags:
+  - name: user.journal
+    description: Represents journal API
+  - name: user.partner
+    description: Represents auth API
+  - name: user.tree
+    description: Represents entire tree API
+  - name: user.tree.node
+    description: Represents tree node API
+paths:
+  /api.user.journal.getRange:
+    post:
+      summary: ''
+      description: >-
+        Provides the pagination API. Skip means the number of items should be
+        skipped by server. Take means the maximum number items should be
+        returned by server. All fields of the filter are optional. 
+      tags:
+        - user.journal
+      parameters:
+        - in: query
+          name: skip
+          required: true
+          type: integer
+          format: int32
+        - in: query
+          name: take
+          required: true
+          type: integer
+          format: int32
+        - in: body
+          name: filter
+          required: false
+          schema:
+            type: object
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/FxNet.Test.Model.MRange_MJournalInfo'
+          description: Successful response
+  /api.user.journal.getSingle:
+    post:
+      summary: ''
+      description: Returns the information about an particular event by ID.
+      tags:
+        - user.journal
+      parameters:
+        - in: query
+          name: id
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/FxNet.Test.Model.MJournal'
+          description: Successful response
+  /api.user.partner.rememberMe:
+    post:
+      summary: ''
+      description: >-
+        (Optional) Saves user by unique code and returns auth token required on all other requests, if implemented.
+      tags:
+        - user.partner
+      parameters:
+        - in: query
+          name: code
+          required: true
+          type: string
+          format: string
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/FxNet.Test.Model.TokenInfo'
+          description: Successful response
+  /api.user.tree.get:
+    post:
+      summary: ''
+      description: >-
+        Returns your entire tree. If your tree doesn't exist it will be created
+        automatically.
+      tags:
+        - user.tree
+      parameters:
+        - in: query
+          name: treeName
+          required: true
+          type: string
+          format: string
+      responses:
+        '200':
+          schema:
+            $ref: '#/definitions/FxNet.Test.Model.MNode'
+          description: Successful response
+  /api.user.tree.node.create:
+    post:
+      summary: ''
+      description: >-
+        Create a new node in your tree. You must to specify a parent node ID
+        that belongs to your tree or dont pass parent ID to create tree first level node. A new node name must be unique across all
+        siblings.
+      tags:
+        - user.tree.node
+      parameters:
+        - in: query
+          name: treeName
+          required: true
+          type: string
+          format: string
+        - in: query
+          name: parentNodeId
+          required: false
+          type: integer
+          format: int64
+        - in: query
+          name: nodeName
+          required: true
+          type: string
+          format: string
+      responses:
+        '200':
+          description: Successful response
+  /api.user.tree.node.delete:
+    post:
+      summary: ''
+      description: >-
+        Delete an existing node and all its descendants
+      tags:
+      - user.tree.node
+      parameters:
+        - in: query
+          name: nodeId
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Successful response
+  /api.user.tree.node.rename:
+    post:
+      summary: ''
+      description: >-
+        Rename an existing node in your tree. A new name of the node must be unique across all
+        siblings.
+      tags:
+        - user.tree.node
+      parameters:
+        - in: query
+          name: nodeId
+          required: true
+          type: integer
+          format: int64
+        - in: query
+          name: newNodeName
+          required: true
+          type: string
+          format: string
+      responses:
+        '200':
+          description: Successful response
+definitions:
+  FxNet.Test.Model.MJournal:
+    properties:
+      text:
+        type: string
+        format: string
+      id:
+        type: integer
+        format: int64
+      eventId:
+        type: integer
+        format: int64
+      createdAt:
+        type: string
+        format: datetime
+        example: '2025-05-23T12:18:16.9222634Z'
+    required:
+      - text
+      - id
+      - eventId
+      - createdAt
+  FxNet.Test.Model.MJournalInfo:
+    properties:
+      id:
+        type: integer
+        format: int64
+      eventId:
+        type: integer
+        format: int64
+      createdAt:
+        type: string
+        format: datetime
+        example: '2025-05-23T12:18:16.922346Z'
+    required:
+      - id
+      - eventId
+      - createdAt
+  FxNet.Test.View.VJournalFilter:
+    properties:
+      from:
+        type: string
+        format: datetime
+        example: '2025-05-23T12:18:16.9223615Z'
+      to:
+        type: string
+        format: datetime
+        example: '2025-05-23T12:18:16.9223726Z'
+      search:
+        type: string
+        format: string
+    required:
+      - search
+  FxNet.Test.Model.MNode:
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+        format: string
+      children:
+        type: array
+        items:
+          $ref: '#/definitions/FxNet.Test.Model.MNode'
+    required:
+      - id
+      - name
+      - children
+  FxNet.Test.Model.MRange_MJournalInfo:
+    properties:
+      skip:
+        type: integer
+        format: int32
+      count:
+        type: integer
+        format: int32
+      items:
+        type: array
+        items:
+          $ref: '#/definitions/FxNet.Test.Model.MJournalInfo'
+    required:
+      - skip
+      - count
+      - items
+  FxNet.Test.Model.TokenInfo:
+    properties:
+      token:
+        type: string
+        format: string
+    required:
+      - skip
+      - count
+      - items
